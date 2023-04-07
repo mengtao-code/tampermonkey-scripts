@@ -4,7 +4,7 @@
 // @version              0.0.1
 // @namespace            https://onerzone.com
 // @description:en       Fix image load error by requesting to origin download link
-// @description:zh       修复inoreader的图片加载
+// @description:zh-CN    修复inoreader的图片加载
 // @author               Noah Xin
 // @license              MIT
 // @supportURL           https://github.com/noah-onerzone/tampermonkey-scripts/blob/master/inoreader/fix-image-error.js

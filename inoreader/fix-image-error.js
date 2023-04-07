@@ -14,8 +14,13 @@
 // ==/UserScript==
 const config = {
     name: "fix-image-error",
-    urlKeys: [ // weibo images prefix
-        'sinaimg.cn'
+    data: [ // weibo images prefix
+        {
+            imageServer: 'sinaimg.cn',
+            customHeader: {
+                Referer: 'https://weibo.com'
+            }
+        }
     ]
 }
 
@@ -77,7 +82,7 @@ const getImageUrl = (data) => {
     return src;
 }
 
-const httpGetReqeust = (url) => {
+const httpGetReqeust = (url, customHeader) => {
     return new Promise((resolve, reject) => {
         GM.xmlHttpRequest({
             method: "GET",
@@ -85,7 +90,7 @@ const httpGetReqeust = (url) => {
             headers: {
                 "Accept": "*/*",
                 "referrerPolicy": "no-referrer",
-                "Referer": "https://weibo.com"
+                ...customHeader
             },
             onload: resolve,
             onerror: reject,
@@ -94,11 +99,11 @@ const httpGetReqeust = (url) => {
     })
 }
 
-const processImage = (dom) => {
+const processImage = (dom, customHeader) => {
     if (dom.getAttribute('processed-tag') !== 'true') {
         dom.setAttribute('alt', 'loading...')
         const originalSrc = dom.getAttribute("data-original-src");
-        httpGetReqeust(originalSrc)
+        httpGetReqeust(originalSrc, customHeader)
             .then(data => {
                 dom.setAttribute('src', getImageUrl(data))
             })
@@ -108,10 +113,10 @@ const processImage = (dom) => {
 }
 
 const main = () => {
-    config.urlKeys.forEach(key => {
+    config.data.forEach(({ imageServer, customHeader }) => {
         Array.from(
-            document.querySelectorAll(`.article_content img[data-original-src*='${key}']`))
-            .forEach(processImage);
+            document.querySelectorAll(`.article_content img[data-original-src*='${imageServer}']`))
+            .forEach(image => processImage(image, customHeader));
     })
 }
 

@@ -3,7 +3,7 @@
 // @name:en          fix-image-error
 // @version          0.0.1
 // @namespace        https://onerzone.com
-// @description      Fix image load error by requesting to origin download link
+// @description:en      Fix image load error by requesting to origin download link
 // @author           Noah Xin
 // @license          MIT
 // @supportURL       https://github.com/noah-onerzone/tampermonkey-scripts/blob/master/inoreader/fix-image-error.js

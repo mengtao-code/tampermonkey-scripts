@@ -69,13 +69,13 @@ function customBase64Encode(inputStr) {
     return output;
 }
 
-const getSrc = (data) => {
+const getImageUrl = (data) => {
     var binResp = customBase64Encode(data.responseText);
     let src = `data:image/jpeg;base64,${binResp}`
     return src;
 }
 
-const get = (url) => {
+const httpGetReqeust = (url) => {
     return new Promise((resolve, reject) => {
         GM.xmlHttpRequest({
             method: "GET",
@@ -92,23 +92,24 @@ const get = (url) => {
     })
 }
 
+const processImage = (dom) => {
+    if (dom.getAttribute('processed-tag') !== 'true') {
+        dom.setAttribute('alt', 'loading...')
+        const originalSrc = dom.getAttribute("data-original-src");
+        httpGetReqeust(originalSrc)
+            .then(data => {
+                dom.setAttribute('src', getImageUrl(data))
+            })
+            .catch(e => console.error(`${config.name} load image failed! ${e}`))
+            .finally(() => dom.setAttribute('processed-tag', 'true'))
+    }
+}
+
 const main = () => {
     config.urlPrefix.forEach(prefix => {
-        let images = Array.from(document.querySelectorAll(`.article_content img[data-original-src^='${prefix}']`));
-        console.log(`${config.name} load images. images length:${images.length}`)
-        images.forEach(image => {
-            if (image.getAttribute('processed-tag') !== 'true') {
-                image.setAttribute('alt', 'loading...')
-                const originalSrc = image.getAttribute("data-original-src");
-                console.log(`originalSrc:${originalSrc}`)
-                get(originalSrc)
-                    .then(data => {
-                        image.setAttribute('src', getSrc(data))
-                    })
-                    .catch(e => console.error(`FBI warning! ${e}`))
-                    .finally(() => image.setAttribute('processed-tag', 'true'))
-            }
-        })
+        Array.from(
+            document.querySelectorAll(`.article_content img[data-original-src^='${prefix}']`))
+            .forEach(processImage);
     })
 }
 

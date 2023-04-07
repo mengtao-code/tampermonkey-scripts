@@ -14,8 +14,8 @@
 // ==/UserScript==
 const config = {
     name: "fix-image-error",
-    urlPrefix: [ // weibo images prefix
-        'https://tvax4.sinaimg.cn'
+    urlKeys: [ // weibo images prefix
+        'sinaimg.cn'
     ]
 }
 
@@ -108,9 +108,9 @@ const processImage = (dom) => {
 }
 
 const main = () => {
-    config.urlPrefix.forEach(prefix => {
+    config.urlKeys.forEach(key => {
         Array.from(
-            document.querySelectorAll(`.article_content img[data-original-src^='${prefix}']`))
+            document.querySelectorAll(`.article_content img[data-original-src*='${key}']`))
             .forEach(processImage);
     })
 }

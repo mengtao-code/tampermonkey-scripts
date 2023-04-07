@@ -1,9 +1,9 @@
 // ==UserScript==
-// @name                 fix-image-error
-// @name:en              fix-image-error
+// @name                 fix-image-error at inoreader
+// @name:zh-CN           修复inoreader图片异常
 // @version              0.0.1
 // @namespace            https://onerzone.com
-// @description:en       Fix image load error by requesting to origin download link
+// @description          Fix image load error by requesting to origin download link
 // @description:zh-CN    修复inoreader的图片加载
 // @author               Noah Xin
 // @license              MIT

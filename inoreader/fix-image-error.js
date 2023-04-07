@@ -1,16 +1,17 @@
 // ==UserScript==
-// @name             fix-image-error
-// @name:en          fix-image-error
-// @version          0.0.1
-// @namespace        https://onerzone.com
-// @description:en      Fix image load error by requesting to origin download link
-// @author           Noah Xin
-// @license          MIT
-// @supportURL       https://github.com/noah-onerzone/tampermonkey-scripts/blob/master/inoreader/fix-image-error.js
-// @include          http*://*.inoreader.com/*
-// @icon             http://www.inoreader.com/favicon.ico
-// @grant GM_xmlhttpRequest
-// @connect *
+// @name                 fix-image-error
+// @name:en              fix-image-error
+// @version              0.0.1
+// @namespace            https://onerzone.com
+// @description:en       Fix image load error by requesting to origin download link
+// @description:zh       修复inoreader的图片加载
+// @author               Noah Xin
+// @license              MIT
+// @supportURL           https://github.com/noah-onerzone/tampermonkey-scripts/blob/master/inoreader/fix-image-error.js
+// @include              http*://*.inoreader.com/*
+// @icon                 http://www.inoreader.com/favicon.ico
+// @grant                GM_xmlhttpRequest
+// @connect              *
 // ==/UserScript==
 const config = {
     name: "fix-image-error",

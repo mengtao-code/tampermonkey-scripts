@@ -13,3 +13,9 @@ style="max-width: 650px; height: auto; object-fit: contain;">
 ```
 
 我们的图片被inoreader以像http代理的方式加载，但是原始服务器可能会禁止inoreader加载。所以我们不得不手动加载图片。
+
+目前支持的原始服务器列表：
+
+* sinaimg.cn
+
+欢迎提供无法正常加载的服务器信息帮助我们提供更好的服务！

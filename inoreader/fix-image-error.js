@@ -1,13 +1,13 @@
 // ==UserScript==
 // @name                 fix-image-error at inoreader
 // @name:zh-CN           修复inoreader图片异常
-// @version              0.0.1
-// @namespace            https://onerzone.com
-// @description          Fix image load error by requesting to origin download link
-// @description:zh-CN    修复inoreader的图片加载
-// @author               Noah Xin
+// @version              0.1.0
+// @namespace            https://github.com/mengtao-code
+// @description          Fix image load error caused by CSP(Content Security Policy)
+// @description:zh-CN    修复inoreader的图片加载问题
+// @author               Mengtao Xin
 // @license              MIT
-// @supportURL           https://github.com/noah-onerzone/tampermonkey-scripts/blob/master/inoreader/fix-image-error.js
+// @supportURL           https://github.com/mengtao-code/tampermonkey-scripts
 // @include              http*://*.inoreader.com/*
 // @icon                 http://www.inoreader.com/favicon.ico
 // @grant                GM_xmlhttpRequest
@@ -29,7 +29,7 @@ const config = {
  * 
  * @link https://stackoverflow.com/questions/8778863/downloading-an-image-using-xmlhttprequest-in-a-userscript
  * @param {*} inputStr 
- * @returns 
+ * @returns {string}
  */
 function customBase64Encode(inputStr) {
     var
@@ -77,13 +77,24 @@ function customBase64Encode(inputStr) {
     return output;
 }
 
+/**
+ *
+ * @param data data from http request
+ * @returns {string}
+ */
 const getImageUrl = (data) => {
     var binResp = customBase64Encode(data.responseText);
     let src = `data:image/jpeg;base64,${binResp}`
     return src;
 }
 
-const httpGetReqeust = (url, customHeader) => {
+/**
+ * send get http request
+ * @param url
+ * @param customHeader
+ * @returns {Promise<unknown>}
+ */
+const httpGetRequest = (url, customHeader) => {
     return new Promise((resolve, reject) => {
         GM.xmlHttpRequest({
             method: "GET",
@@ -104,7 +115,7 @@ const processImage = (dom, customHeader) => {
     if (dom.getAttribute('processed-tag') !== 'true') {
         dom.setAttribute('alt', 'loading...')
         const originalSrc = dom.getAttribute("data-original-src");
-        httpGetReqeust(originalSrc, customHeader)
+        httpGetRequest(originalSrc, customHeader)
             .then(data => {
                 dom.setAttribute('src', getImageUrl(data))
             })
@@ -113,6 +124,9 @@ const processImage = (dom, customHeader) => {
     }
 }
 
+/**
+ * 检测到有异常图片，就调整成正常的图片
+ */
 const main = () => {
     config.data.forEach(({ imageServer, customHeader }) => {
         Array.from(

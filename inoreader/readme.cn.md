@@ -1,4 +1,4 @@
-修复 [inoreader](https://www.inoreader.com/)的图片加载异常
+修复 [inoreader](https://www.inoreader.com/)可能的图片加载异常
 
 ## 问题原因
 

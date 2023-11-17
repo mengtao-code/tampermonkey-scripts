@@ -13,12 +13,15 @@
 // @grant                GM_xmlhttpRequest
 // @connect              *
 // ==/UserScript==
+
+const LOADING_PROMPT = "Loading..."
+
 const config = {
     name: "fix-image-error",
     data: [ // weibo images prefix
         {
             imageServer: 'sinaimg.cn',
-            customHeader: {
+            mockHeader: {
                 Referer: 'https://weibo.com'
             }
         }
@@ -26,16 +29,16 @@ const config = {
 }
 
 /**
- * 
+ *
  * @link https://stackoverflow.com/questions/8778863/downloading-an-image-using-xmlhttprequest-in-a-userscript
- * @param {*} inputStr 
+ * @param {*} input
  * @returns {string}
  */
-function customBase64Encode(inputStr) {
+function toBase64(input) {
     var
         bbLen = 3,
         enCharLen = 4,
-        inpLen = inputStr.length,
+        inpLen = input.length,
         inx = 0,
         jnx,
         keyStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
@@ -49,7 +52,7 @@ function customBase64Encode(inputStr) {
     while (inx < inpLen) {
         for (jnx = 0; jnx < bbLen; ++jnx) {
             if (inx < inpLen)
-                bytebuffer[jnx] = inputStr.charCodeAt(inx++) & 0xff;
+                bytebuffer[jnx] = input.charCodeAt(inx++) & 0xff;
             else
                 bytebuffer[jnx] = 0;
         }
@@ -79,13 +82,12 @@ function customBase64Encode(inputStr) {
 
 /**
  *
- * @param data data from http request
+ * @param responseData data from http request
  * @returns {string}
  */
-const getImageUrl = (data) => {
-    var binResp = customBase64Encode(data.responseText);
-    let src = `data:image/jpeg;base64,${binResp}`
-    return src;
+const getImageUrl = (responseData) => {
+    const binResp = toBase64(responseData.responseText);
+    return `data:image/jpeg;base64,${binResp}`;
 }
 
 /**
@@ -111,16 +113,29 @@ const httpGetRequest = (url, customHeader) => {
     })
 }
 
-const processImage = (dom, customHeader) => {
+const cache = {}
+
+const processDetailImage = (dom, customHeader) => {
     if (dom.getAttribute('processed-tag') !== 'true') {
-        dom.setAttribute('alt', 'loading...')
-        const originalSrc = dom.getAttribute("data-original-src");
-        httpGetRequest(originalSrc, customHeader)
-            .then(data => {
-                dom.setAttribute('src', getImageUrl(data))
+        dom.setAttribute('alt', LOADING_PROMPT)
+        const originUrl = dom.getAttribute("data-original-src");
+        httpGetRequest(originUrl, customHeader)
+            .then(responseData => {
+                const badUrl = dom.getAttribute('src')
+                const goodUrl = getImageUrl(responseData);
+                cache[`background-image:url('${badUrl}')`] = goodUrl
+                dom.setAttribute('src', goodUrl)
             })
             .catch(e => console.error(`${config.name} load image failed! ${e}`))
             .finally(() => dom.setAttribute('processed-tag', 'true'))
+    }
+}
+
+
+const processListImage = (dom) => {
+    const style = dom.getAttribute("style")
+    if (cache[style.replace(',q80,x600', '')]) {
+        dom.setAttribute("style", `background-image:url('${cache[style.replace(',q80,x600', '')]}')`)
     }
 }
 
@@ -128,10 +143,16 @@ const processImage = (dom, customHeader) => {
  * 检测到有异常图片，就调整成正常的图片
  */
 const main = () => {
-    config.data.forEach(({ imageServer, customHeader }) => {
+    config.data.forEach(({imageServer, mockHeader}) => {
+        // 1. detail pages
         Array.from(
             document.querySelectorAll(`.article_content img[data-original-src*='${imageServer}']`))
-            .forEach(image => processImage(image, customHeader));
+            .forEach(image => processDetailImage(image, mockHeader));
+
+        // 2. list page
+        Array.from(
+            document.querySelectorAll(`.article_magazine_picture`))
+            .forEach(image => processListImage(image));
     })
 }
 

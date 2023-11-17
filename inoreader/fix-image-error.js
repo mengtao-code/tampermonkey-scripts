@@ -113,30 +113,37 @@ const httpGetRequest = (url, customHeader) => {
     })
 }
 
-const cache = {}
-
-const processDetailImage = (dom, customHeader) => {
-    if (dom.getAttribute('processed-tag') !== 'true') {
+const processDetailImage = (dom, mockHeader) => {
+    if (dom.getAttribute('process-tag') !== 'doing' && dom.getAttribute('process-tag') !== 'done') {
+        dom.setAttribute("process-tag", "doing")
         dom.setAttribute('alt', LOADING_PROMPT)
         const originUrl = dom.getAttribute("data-original-src");
-        httpGetRequest(originUrl, customHeader)
+        httpGetRequest(originUrl, mockHeader)
             .then(responseData => {
-                const badUrl = dom.getAttribute('src')
                 const goodUrl = getImageUrl(responseData);
-                cache[`background-image:url('${badUrl}')`] = goodUrl
                 dom.setAttribute('src', goodUrl)
             })
             .catch(e => console.error(`${config.name} load image failed! ${e}`))
-            .finally(() => dom.setAttribute('processed-tag', 'true'))
+            .finally(() => dom.setAttribute('process-tag', 'done'))
     }
 }
 
 
-const processListImage = (dom) => {
-    const style = dom.getAttribute("style")
-    if (cache[style.replace(',q80,x600', '')]) {
-        dom.setAttribute("style", `background-image:url('${cache[style.replace(',q80,x600', '')]}')`)
+const processListImage = (dom, mockHeader) => {
+    if (dom.getAttribute('process-tag') !== 'doing' && dom.getAttribute('process-tag') !== 'done') {
+        dom.setAttribute("process-tag", "doing")
+        const style = dom.getAttribute("style")
+        const originUrl = atob(style.substring(style.indexOf("b64/") + 4).replace("')", ""))
+        httpGetRequest(originUrl, mockHeader)
+            .then(responseData => {
+                const goodUrl = getImageUrl(responseData);
+                dom.setAttribute('style', `background-image:url('${goodUrl}')`)
+            })
+            .catch(e => console.error(`${config.name} load image failed! ${e}`))
+            .finally(() => dom.setAttribute('process-tag', 'done'))
     }
+
+
 }
 
 /**
@@ -152,7 +159,7 @@ const main = () => {
         // 2. list page
         Array.from(
             document.querySelectorAll(`.article_magazine_picture`))
-            .forEach(image => processListImage(image));
+            .forEach(image => processListImage(image, mockHeader));
     })
 }
 

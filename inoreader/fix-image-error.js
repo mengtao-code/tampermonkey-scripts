@@ -117,7 +117,7 @@ const processDetailImage = (dom, mockHeader) => {
     if (dom.getAttribute('process-tag') !== 'doing' && dom.getAttribute('process-tag') !== 'done') {
         dom.setAttribute("process-tag", "doing")
         dom.setAttribute('alt', LOADING_PROMPT)
-        const originUrl = dom.getAttribute("data-original-src");
+        const originUrl = dom.getAttribute("src");
         httpGetRequest(originUrl, mockHeader)
             .then(responseData => {
                 const goodUrl = getImageUrl(responseData);
@@ -133,7 +133,7 @@ const processListImage = (dom, mockHeader) => {
     if (dom.getAttribute('process-tag') !== 'doing' && dom.getAttribute('process-tag') !== 'done') {
         dom.setAttribute("process-tag", "doing")
         const style = dom.getAttribute("style")
-        const originUrl = atob(style.substring(style.indexOf("b64/") + 4).replace("')", ""))
+        const originUrl = style.substring(style.indexOf("https") + 5).replace("')", "")
         httpGetRequest(originUrl, mockHeader)
             .then(responseData => {
                 const goodUrl = getImageUrl(responseData);
@@ -153,7 +153,7 @@ const main = () => {
     config.data.forEach(({imageServer, mockHeader}) => {
         // 1. detail pages
         Array.from(
-            document.querySelectorAll(`.article_content img[data-original-src*='${imageServer}']`))
+            document.querySelectorAll(`.article_content img[src*='${imageServer}']`))
             .forEach(image => processDetailImage(image, mockHeader));
 
         // 2. list page

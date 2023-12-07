@@ -133,17 +133,17 @@ const processListImage = (dom, mockHeader) => {
     if (dom.getAttribute('process-tag') !== 'doing' && dom.getAttribute('process-tag') !== 'done') {
         dom.setAttribute("process-tag", "doing")
         const style = dom.getAttribute("style")
-        const originUrl = style.substring(style.indexOf("https") + 5).replace("')", "")
+        const originUrl = style.substring(style.indexOf("https")).replace("')", "")
+        console.log(`originUrl:${originUrl}`)
         httpGetRequest(originUrl, mockHeader)
             .then(responseData => {
                 const goodUrl = getImageUrl(responseData);
                 dom.setAttribute('style', `background-image:url('${goodUrl}')`)
+
             })
             .catch(e => console.error(`${config.name} load image failed! ${e}`))
             .finally(() => dom.setAttribute('process-tag', 'done'))
     }
-
-
 }
 
 /**
@@ -159,7 +159,7 @@ const main = () => {
         // 2. list page
         Array.from(
             document.querySelectorAll(`.article_magazine_picture`))
-            .filter(dom=>{dom.getAttribute("style").contains(imageServer)})
+            .filter(dom=>dom.getAttribute("style").includes(imageServer))
             .forEach(image => processListImage(image, mockHeader));
     })
 }

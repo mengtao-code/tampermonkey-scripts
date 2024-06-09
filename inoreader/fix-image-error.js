@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name                 fix-image-error at inoreader
 // @name:zh-CN           修复inoreader图片异常
-// @version              0.4.0
+// @version              0.5.0
 // @namespace            https://github.com/mengtao-code
 // @description          Fix image load error caused by CSP(Content Security Policy)
 // @description:zh-CN    修复inoreader的图片加载问题

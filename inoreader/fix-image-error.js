@@ -153,7 +153,7 @@ const main = () => {
         Array.from(document.querySelectorAll(`.article_content img[src*='${imageServer}']`)).forEach(image => processDetailImage(image, mockHeader))
 
         // 2. list pages
-        Array.from(document.querySelectorAll(`.article_magazine_picture`))
+        Array.from(document.querySelectorAll(`.article_magazine_picture, .article_tile_picture`))
             .filter(dom => dom.getAttribute('style').includes(imageServer))
             .forEach(image => processListImage(image, mockHeader))
     })
